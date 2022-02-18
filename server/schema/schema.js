@@ -1,4 +1,5 @@
 const graphql = require('graphql'); // graphqlオブジェクトをimport
+const Movie = require('../models/movie'); // Movieモデルをimport
 // GraphQLに備わっている型をimportして使う
 const { GraphQLObjectType, GraphQLID, GraphQLString } = graphql;
 
@@ -26,8 +27,14 @@ const RootQuery = new GraphQLObjectType({
       args: { id: { type: GraphQLID } },
       // argsを用いて取得するデータを定義
       resolve(parents, args) {
-        
+        // Movieモデルからデータを取得 findByIdはmongooseのメソッド
+        return Movie.findById(args.id);
       },
     },
   }),
 });
+
+// RootQueryをGrapohQLのスキーマとしてexport
+module.exports = new graphql.GraphQLSchema({
+  query: RootQuery,
+})
