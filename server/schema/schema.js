@@ -34,7 +34,35 @@ const RootQuery = new GraphQLObjectType({
   }),
 });
 
-// RootQueryをGrapohQLのスキーマとしてexport
+// GraphQLObjectTypeでmutationオブジェクトを生成
+// データの更新の処理
+const Mutation = new GraphQLObjectType({
+  name: 'Mutation',
+  fields:{
+    addMovie: {
+      type: MovieType, // movieを扱うのでmovieType
+      // argsには更新時に利用するパラメーターを定義
+      args: {
+        name: { type: GraphQLString },
+        genre: { type: GraphQLString },
+      },
+      resolve(parents, args) {
+        // new Movie()でモデルのインスタンスを生成
+        // save()でデータを保存
+        const movie = new Movie({
+          name: args.name, // 受け取った値を代入
+          genre: args.genre,
+        });
+        // saveメソッドを使ってデータを保存
+        // 追加した値が返ってくる
+        return movie.save();
+      }
+    }
+  }
+})
+
+// GrapohQLのスキーマとしてexport
 module.exports = new graphql.GraphQLSchema({
-  query: RootQuery,
+  query: RootQuery, // queryオブジェクトをexport
+  mutation: Mutation,  // mutationオブジェクトをexport
 })
