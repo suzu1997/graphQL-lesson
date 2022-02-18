@@ -10,7 +10,7 @@ const app = express();
 
 // MongoDBとの接続
 mongoose.connect(
-  'mongodb+srv://admin:Chie0326@cluster0.bl2ch.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
+  'mongodb+srv://admin:Chie0326@cluster0.bl2ch.mongodb.net/test?retryWrites=true&w=majority'
 );
 // 接続完了時のイベントリスナーに関数を登録
 mongoose.connection.once('open', () => {
