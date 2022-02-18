@@ -3,6 +3,7 @@ const express = require('express');
 const { graphqlHTTP } = require('express-graphql');
 // MongoDBへの接続用にmongooseをimport
 const mongoose = require('mongoose');
+const schema = require('./schema/schema'); // 作成したスキーマをimport
 
 // expressのインスタンスを生成
 // アプリケーション構築に必要な機能を提供する
@@ -17,12 +18,14 @@ mongoose.connection.once('open', () => {
   console.log('db connected');
 });
 
-// 一つのエンドポイントでデータのやりとりを行うためにミドルウェアを作成
+// 一つのエンドポイントでデータのやりとりを行うためにミドルウェアを作成(app.useを使う)
 // 第一引数にパス、第二引数にミドルウェアのハンドラー関数
 app.use(
   '/graphql',
   graphqlHTTP({
     // schemaはgraphqlのスキーマを定義
+    schema, // ./schema/schemaで定義したもの
+    graphiql: true, // graphiqlを使うかどうか
   })
 );
 
