@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client';
 
 gql`
- query getMovies {
+  query getMovies {
     movies {
       id
       name
@@ -10,6 +10,15 @@ gql`
         name
         age
       }
+    }
+  }
+`;
+
+gql`
+  query getDirectors {
+    directors {
+      id
+      name
     }
   }
 `;
