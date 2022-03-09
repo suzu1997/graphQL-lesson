@@ -41,3 +41,12 @@ gql`
     }
   }
 `
+
+gql`
+  mutation deleteMovie($id: ID!) {
+  deleteMovie (id: $id) {
+      id
+      name
+    }
+  }
+`
