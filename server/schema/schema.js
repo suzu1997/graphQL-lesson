@@ -2,8 +2,14 @@ const graphql = require('graphql'); // graphqlオブジェクトをimport
 const Movie = require('../models/movie'); // Movieモデルをimport
 const Director = require('../models/director'); // Directorモデルをimport
 // GraphQLに備わっている型をimportして使う
-const { GraphQLObjectType, GraphQLID, GraphQLString, GraphQLInt, GraphQLList } =
-  graphql;
+const {
+  GraphQLObjectType,
+  GraphQLID,
+  GraphQLString,
+  GraphQLInt,
+  GraphQLList, // リスト型
+  GraphQLNonNull, // NonNull型
+} = graphql;
 
 // Movieのスキーマを定義
 // GraphQLObjectTypeのインスタンスを生成
@@ -124,6 +130,42 @@ const Mutation = new GraphQLObjectType({
           age: args.age,
         });
         return director.save();
+      },
+    },
+    updateMovie: {
+      type: MovieType,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLID) }, // typeは必須にしたいのでNonNullを使う
+        name: { type: GraphQLString },
+        genre: { type: GraphQLString },
+        directorId: { type: GraphQLID },
+      },
+      resolve(parents, args) {
+        let updateMovie = {}; // 空オブジェクトを作成しておく
+        args.name && (updateMovie.name = args.name); // 更新情報があれば、updateDirectorに代入
+        args.genre && (updateMovie.genre = args.genre);
+        args.directorId && (updateMovie.directorId = args.directorId);
+        // findByIdAndUpdate(Id, 更新情報)で更新
+        return Movie.findByIdAndUpdate(args.id, updateMovie, {
+          new: true, // trueにすると更新後のデータを返す
+        });
+      },
+    },
+    updateDirector: {
+      type: DirectorType,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLID) }, // typeは必須にしたいのでNonNullを使う
+        name: { type: GraphQLString },
+        age: { type: GraphQLInt },
+      },
+      resolve(parents, args) {
+        let updateDirector = {}; // 空オブジェクトを作成しておく
+        args.name && (updateDirector.name = args.name); // 更新情報があれば、updateDirectorに代入
+        args.age && (updateDirector.age = args.age);
+        // findByIdAndUpdate(Id, 更新情報)で更新
+        return Director.findByIdAndUpdate(args.id, updateDirector, {
+          new: true, // trueにすると更新後のデータを返す
+        });
       },
     },
   },
