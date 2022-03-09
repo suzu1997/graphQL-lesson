@@ -19,8 +19,8 @@ const MovieType = new GraphQLObjectType({
   // fieldsで取得したいデータとその型を定義
   // 関数でラップしてカプセル化
   fields: () => ({
-    id: { type: GraphQLID },
-    name: { type: GraphQLString },
+    id: { type: new GraphQLNonNull(GraphQLID) },
+    name: { type: new GraphQLNonNull(GraphQLString) },
     genre: { type: GraphQLString },
     director: {
       type: DirectorType,
@@ -40,9 +40,9 @@ const DirectorType = new GraphQLObjectType({
   // fieldsで取得したいデータとその型を定義
   // 関数でラップしてカプセル化
   fields: () => ({
-    id: { type: GraphQLID },
-    name: { type: GraphQLString },
-    age: { type: GraphQLInt },
+    id: { type: new GraphQLNonNull(GraphQLID) },
+    name: { type: new GraphQLNonNull(GraphQLString) },
+    age: { type: new GraphQLNonNull(GraphQLInt) },
     movies: {
       type: new GraphQLList(MovieType), // Directorには複数のMovieが紐づく
       resolve(parents, args) {
@@ -62,7 +62,7 @@ const RootQuery = new GraphQLObjectType({
     movie: {
       type: MovieType,
       // argsには検索時に利用するパラメーターを定義
-      args: { id: { type: GraphQLID } }, // 型も指定する
+      args: { id: { type: new GraphQLNonNull(GraphQLID) } }, // 型も指定する
       // argsを用いて取得するデータを定義
       resolve(parents, args) {
         // Movieモデルからデータを取得 findByIdはmongooseのメソッド
@@ -70,7 +70,7 @@ const RootQuery = new GraphQLObjectType({
       },
     },
     movies: {
-      type: new GraphQLList(MovieType),
+      type: new GraphQLNonNull(new GraphQLList(MovieType)),
       resolve(parents, args) {
         return Movie.find(); // 全てのデータを取得
       },
@@ -78,13 +78,13 @@ const RootQuery = new GraphQLObjectType({
     director: {
       type: DirectorType,
       // argsには検索時に利用するパラメーターを定義
-      args: { id: { type: GraphQLID } }, // 型も指定する
+      args: { id: { type: new GraphQLNonNull(GraphQLID) } }, // 型も指定する
       resolve(parents, args) {
         return Director.findById(args.id); // idで絞り込み
       },
     },
     directors: {
-      type: new GraphQLList(DirectorType),
+      type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(DirectorType))),
       resolve(parents, args) {
         return Director.find(); // 全てのデータを取得
       },
