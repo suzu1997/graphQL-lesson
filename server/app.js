@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 // express-graphqlからgraphqlHTTPをimport
 const { graphqlHTTP } = require('express-graphql');
 // MongoDBへの接続用にmongooseをimport
@@ -8,6 +9,15 @@ const schema = require('./schema/schema'); // 作成したスキーマをimport
 // expressのインスタンスを生成
 // アプリケーション構築に必要な機能を提供する
 const app = express();
+
+// CORSの設定
+const allowedOrigins = ['http://localhost:3000'];
+
+const options = {
+  origin: allowedOrigins,
+};
+
+app.use(cors(options));
 
 // MongoDBとの接続
 mongoose.connect(
