@@ -7,10 +7,37 @@ import {
   FormGroup,
   Button,
 } from 'reactstrap';
-import { useGetDirectorsQuery } from '../type/generated/graphql';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import {
+  useGetDirectorsQuery,
+  useAddMovieMutation,
+} from '../type/generated/graphql';
+
+type MovieFormInput = {
+  movieName: string;
+  movieGenre: string;
+  directorId: string;
+};
 
 export const SideNav: FC = memo(() => {
   const { data } = useGetDirectorsQuery();
+  const [addMovie] = useAddMovieMutation();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<MovieFormInput>();
+
+  const onSubmit: SubmitHandler<MovieFormInput> = (data) => {
+    addMovie({
+      variables: {
+        name: data.movieName,
+        genre: data.movieGenre,
+        directorId: data.directorId,
+      },
+    });
+  };
 
   return (
     <>
@@ -43,25 +70,25 @@ export const SideNav: FC = memo(() => {
       <Card className='mt-4'>
         <CardHeader>映画作品</CardHeader>
         <CardBody>
-          <Form>
+          <Form onSubmit={handleSubmit(onSubmit)}>
             <FormGroup>
               <input
                 className='form-control'
                 type='text'
-                name='movieName'
                 placeholder='タイトル'
+                {...register('movieName')}
               />
             </FormGroup>
             <FormGroup>
               <input
                 className='form-control'
                 type='text'
-                name='movieGenre'
                 placeholder='ジャンル'
+                {...register('movieGenre')}
               />
             </FormGroup>
             <FormGroup>
-              <select className='form-control' name='directorId'>
+              <select className='form-control' {...register('directorId')}>
                 {data &&
                   data.directors.length &&
                   data.directors.map((director) => (
