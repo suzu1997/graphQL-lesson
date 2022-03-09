@@ -168,6 +168,26 @@ const Mutation = new GraphQLObjectType({
         });
       },
     },
+    deleteMovie: {
+      type: MovieType,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLID) }, // typeは必須にしたいのでNonNullを使う
+      },
+      resolve(parents, args) {
+        // findByIdAndRemove(Id)で削除
+        return Movie.findByIdAndRemove(args.id);
+      },
+    },
+    deleteDirector: {
+      type: DirectorType,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLID) }, // typeは必須にしたいのでNonNullを使う
+      },
+      resolve(parents, args) {
+        // findByIdAndRemove(Id)で削除
+        return Director.findByIdAndRemove(args.id);
+      },
+    },
   },
 });
 
