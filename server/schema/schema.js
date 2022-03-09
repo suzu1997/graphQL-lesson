@@ -16,6 +16,14 @@ const MovieType = new GraphQLObjectType({
     id: { type: GraphQLID },
     name: { type: GraphQLString },
     genre: { type: GraphQLString },
+    director: {
+      type: DirectorType,
+      resolve(parents, args) {
+        // parentsにはMovieモデルのデータが入る
+        // MovieのdirectorIdから、関連するDirectorのデータを取得
+        return Director.findById(parents.directorId);
+      },
+    },
   }),
 });
 
@@ -29,6 +37,14 @@ const DirectorType = new GraphQLObjectType({
     id: { type: GraphQLID },
     name: { type: GraphQLString },
     age: { type: GraphQLInt },
+    movies: {
+      type: new GraphQLList(MovieType), // Directorには複数のMovieが紐づく
+      resolve(parents, args) {
+        // parentsにはDirectorの情報が入る
+        // MovieのdirectorIdとDirectorのIDが一致するデータを取得
+        return Movie.find({ directorId: parents.id });
+      },
+    },
   }),
 });
 
@@ -81,6 +97,7 @@ const Mutation = new GraphQLObjectType({
       args: {
         name: { type: GraphQLString },
         genre: { type: GraphQLString },
+        directorId: { type: GraphQLID },
       },
       resolve(parents, args) {
         // new Movie()でモデルのインスタンスを生成
@@ -88,6 +105,7 @@ const Mutation = new GraphQLObjectType({
         const movie = new Movie({
           name: args.name, // 受け取った値を代入
           genre: args.genre,
+          directorId: args.directorId,
         });
         // saveメソッドを使ってデータを保存
         // 追加した値が返ってくる
