@@ -1,7 +1,18 @@
 import { FC, memo } from 'react';
-import { Card,CardBody, Table } from 'reactstrap';
+import { Card, CardBody, Table } from 'reactstrap';
+import { useQuery } from '@apollo/client';
+import { GET_MOVIES } from '../queries/queries';
 
 export const MovieList: FC = memo(() => {
+  const { data, error, loading } = useQuery(GET_MOVIES);
+
+  if (error) {
+    <div>エラー</div>;
+  }
+  if (loading) {
+    <div>...Loading</div>;
+  }
+
   return (
     <Card>
       <CardBody>
@@ -14,21 +25,14 @@ export const MovieList: FC = memo(() => {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>タイトル</td>
-              <td>ジャンル</td>
-              <td>監督</td>
-            </tr>
-            <tr>
-              <td>タイトル</td>
-              <td>ジャンル</td>
-              <td>監督</td>
-            </tr>
-            <tr>
-              <td>タイトル</td>
-              <td>ジャンル</td>
-              <td>監督</td>
-            </tr>
+            {data &&
+              data.movies.map((movie: any) => (
+                <tr>
+                  <td>{movie.name}</td>
+                  <td>{movie.genre}</td>
+                  <td>{movie.director.name}</td>
+                </tr>
+              ))}
           </tbody>
         </Table>
       </CardBody>
