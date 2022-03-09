@@ -22,3 +22,12 @@ gql`
     }
   }
 `;
+
+gql`
+  mutation addMovie($name: String!, $genre: String!, $directorId: ID! ) {
+    addMovie (name: $name, genre: $genre, directorId: $directorId) {
+      id
+      name
+    }
+  }
+`
