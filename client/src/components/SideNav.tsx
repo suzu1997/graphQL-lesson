@@ -11,6 +11,9 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import {
   useGetDirectorsQuery,
   useAddMovieMutation,
+  useAddDirectorMutation,
+  GetMoviesDocument,
+  GetDirectorsDocument,
 } from '../type/generated/graphql';
 
 type MovieFormInput = {
@@ -19,24 +22,59 @@ type MovieFormInput = {
   directorId: string;
 };
 
+type DirectorFormInput = {
+  directorName: string;
+  directorAge: number;
+};
+
 export const SideNav: FC = memo(() => {
   const { data } = useGetDirectorsQuery();
-  const [addMovie] = useAddMovieMutation();
 
+  const [addMovie] = useAddMovieMutation({
+    refetchQueries: [{ query: GetMoviesDocument }],
+    awaitRefetchQueries: true, // addMovieの実行結果を待ってから、GetMoviesDocumentを再取得する
+  });
+
+  const [addDirector] = useAddDirectorMutation({
+    refetchQueries: [{ query: GetDirectorsDocument }],
+    awaitRefetchQueries: true, // addMovieの実行結果を待ってから、GetMoviesDocumentを再取得する
+  });
+
+  const { register, handleSubmit, reset } = useForm<MovieFormInput>();
   const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<MovieFormInput>();
+    register: registerDirector,
+    handleSubmit: handleSubmitDirector,
+    reset: resetDirector,
+  } = useForm<DirectorFormInput>();
 
-  const onSubmit: SubmitHandler<MovieFormInput> = (data) => {
-    addMovie({
-      variables: {
-        name: data.movieName,
-        genre: data.movieGenre,
-        directorId: data.directorId,
-      },
-    });
+  const onMovieSubmit: SubmitHandler<MovieFormInput> = (data) => {
+    try {
+      addMovie({
+        variables: {
+          name: data.movieName,
+          genre: data.movieGenre,
+          directorId: data.directorId,
+        },
+      });
+      reset();
+    } catch (error) {
+      alert('エラーが発生しました');
+    }
+  };
+
+  const onDirectorSubmit: SubmitHandler<DirectorFormInput> = (data) => {
+    console.log(data);
+    try {
+      addDirector({
+        variables: {
+          name: data.directorName,
+          age: Number(data.directorAge),
+        },
+      });
+    } catch (error) {
+      alert('エラーが発生しました');
+    }
+    resetDirector();
   };
 
   return (
@@ -44,10 +82,11 @@ export const SideNav: FC = memo(() => {
       <Card>
         <CardHeader>映画監督</CardHeader>
         <CardBody>
-          <Form>
+          <Form onSubmit={handleSubmitDirector(onDirectorSubmit)}>
             <FormGroup>
               <input
                 className='form-control'
+                {...registerDirector('directorName')}
                 type='text'
                 name='directorName'
                 placeholder='監督名'
@@ -56,6 +95,7 @@ export const SideNav: FC = memo(() => {
             <FormGroup>
               <input
                 className='form-control'
+                {...registerDirector('directorAge')}
                 type='number'
                 name='directorAge'
                 placeholder='年齢'
@@ -70,7 +110,7 @@ export const SideNav: FC = memo(() => {
       <Card className='mt-4'>
         <CardHeader>映画作品</CardHeader>
         <CardBody>
-          <Form onSubmit={handleSubmit(onSubmit)}>
+          <Form onSubmit={handleSubmit(onMovieSubmit)}>
             <FormGroup>
               <input
                 className='form-control'
@@ -87,16 +127,17 @@ export const SideNav: FC = memo(() => {
                 {...register('movieGenre')}
               />
             </FormGroup>
+
             <FormGroup>
-              <select className='form-control' {...register('directorId')}>
-                {data &&
-                  data.directors.length &&
-                  data.directors.map((director) => (
+              {data && (
+                <select className='form-control' {...register('directorId')}>
+                  {data.directors.map((director) => (
                     <option key={director.id} value={director.id}>
                       {director.name}
                     </option>
                   ))}
-              </select>
+                </select>
+              )}
             </FormGroup>
             <Button color='primary' type='submit'>
               追加

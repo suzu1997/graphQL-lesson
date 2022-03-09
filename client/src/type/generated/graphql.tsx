@@ -116,6 +116,14 @@ export type AddMovieMutationVariables = Exact<{
 
 export type AddMovieMutation = { __typename?: 'Mutation', addMovie?: { __typename?: 'Movie', id: string, name: string } | null };
 
+export type AddDirectorMutationVariables = Exact<{
+  name: Scalars['String'];
+  age: Scalars['Int'];
+}>;
+
+
+export type AddDirectorMutation = { __typename?: 'Mutation', addDirector?: { __typename?: 'Director', id: string, name: string, age: number } | null };
+
 
 export const GetMoviesDocument = gql`
     query getMovies {
@@ -228,3 +236,39 @@ export function useAddMovieMutation(baseOptions?: Apollo.MutationHookOptions<Add
 export type AddMovieMutationHookResult = ReturnType<typeof useAddMovieMutation>;
 export type AddMovieMutationResult = Apollo.MutationResult<AddMovieMutation>;
 export type AddMovieMutationOptions = Apollo.BaseMutationOptions<AddMovieMutation, AddMovieMutationVariables>;
+export const AddDirectorDocument = gql`
+    mutation addDirector($name: String!, $age: Int!) {
+  addDirector(name: $name, age: $age) {
+    id
+    name
+    age
+  }
+}
+    `;
+export type AddDirectorMutationFn = Apollo.MutationFunction<AddDirectorMutation, AddDirectorMutationVariables>;
+
+/**
+ * __useAddDirectorMutation__
+ *
+ * To run a mutation, you first call `useAddDirectorMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddDirectorMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addDirectorMutation, { data, loading, error }] = useAddDirectorMutation({
+ *   variables: {
+ *      name: // value for 'name'
+ *      age: // value for 'age'
+ *   },
+ * });
+ */
+export function useAddDirectorMutation(baseOptions?: Apollo.MutationHookOptions<AddDirectorMutation, AddDirectorMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddDirectorMutation, AddDirectorMutationVariables>(AddDirectorDocument, options);
+      }
+export type AddDirectorMutationHookResult = ReturnType<typeof useAddDirectorMutation>;
+export type AddDirectorMutationResult = Apollo.MutationResult<AddDirectorMutation>;
+export type AddDirectorMutationOptions = Apollo.BaseMutationOptions<AddDirectorMutation, AddDirectorMutationVariables>;

@@ -6,10 +6,11 @@ export const MovieList: FC = memo(() => {
   const { data, error, loading } = useGetMoviesQuery();
 
   if (error) {
-    <div>エラー</div>;
+    console.log(error);
+    return <div>エラー</div>;
   }
   if (loading) {
-    <div>...Loading</div>;
+    return <div>...Loading</div>;
   }
 
   return (
